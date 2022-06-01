@@ -19,9 +19,10 @@ class MarketCapResource extends JsonResource
         $coin= Coins::find($this->id);
         return [
 
+
             'name' => $this->name,
             'symbol' => $this->symbol,
-            'old_market_cap' => new MarketCapDBResource($coin),
+            'old_market_cap' =>  new MarketCapDBResource($coin),
             'num_market_pairs' => $this->num_market_pairs,
             'market_cap' => $this->quote->USD->market_cap,
             'fully_diluted_market_cap' => $this->quote->USD->fully_diluted_market_cap,

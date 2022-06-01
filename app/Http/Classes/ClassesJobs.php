@@ -22,6 +22,7 @@ class ClassesJobs
 
         for ($i = 0; $i <= 4999; $i++) {
             $data[] = [
+                'IDs' => $response->data[$i]->id,
                 'name' => $response->data[$i]->name,
                 'symbol' => $response->data[$i]->symbol,
                 'price' => $response->data[$i]->quote->USD->price,

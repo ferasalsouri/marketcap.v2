@@ -15,6 +15,7 @@ class CreateCoinsTable extends Migration
     {
         Schema::create('coins', function (Blueprint $table) {
             $table->id();
+            $table->integer('IDs');
             $table->string('name');
             $table->string('symbol');
             $table->double('market_cap');

@@ -1,13 +1,18 @@
 @extends('layouts.app')
 
 
-{{--    <link href="{{asset('datatables/datatables.bundle.rtl.css')}}" rel="stylesheet" type="text/css"/>--}}
+<link href="{{asset('datatables/datatables.bundle.rtl.css')}}" rel="stylesheet" type="text/css"/>
 
-{{--    <style>--}}
-{{--        table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {--}}
-{{--            padding-right: 15px;--}}
-{{--        }--}}
-{{--    </style>--}}
+<style>
+    table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {
+        padding-right: 15px;
+    }
+
+    input[type=search] {
+        float: left
+    }
+
+</style>
 @section('content')
 
     <div class="container">
@@ -27,7 +32,7 @@
                             <thead>
                             <tr>
                                 <th scope="col">coin</th>
-                                <th scope="col">status</th>
+                                <th scope="col">num market pairs</th>
                                 <th scope="col">open market cap</th>
                                 <th scope="col">open price</th>
 
@@ -51,9 +56,9 @@
 @section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-{{--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"--}}
-{{--            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"--}}
-{{--            crossorigin="anonymous"></script>--}}
+    {{--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"--}}
+    {{--            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"--}}
+    {{--            crossorigin="anonymous"></script>--}}
     <script src="{{asset('datatables/datatables.bundle.js')}}" type="text/javascript"></script>
     <script>
         $.ajaxSetup({
@@ -93,25 +98,36 @@
                     "bStateSave": true,
                     serverSide: true,
                     columns: [
-                        {data: 'name', name: 'name'},
-                        {data: 'symbol', name: 'symbol'},
-                        // {data: 'old_market_cap', name: 'old_market_cap'},
-                        {
-                            name: 'old_market_cap', "render": function (data, type, row) {
 
-                                return row["market_cap"];
-                            }
-                        },
                         {
-                            name: 'old_market_cap', "render": function (data, type, row) {
-                                var dataRender;
-                                if (row['old_market_cap'] == null) {
-                                    return "null";
-                                }
-                                return row['old_market_cap']['price'];
+                            name: 'name', "render": function (data, type, row) {
+
+                                return row["name"] + " (" + `${row['symbol']}` + ")"
                             }
                         },
                         {data: 'num_market_pairs', name: 'num_market_pairs'},
+                        {
+                            name: 'old_market_cap', "render": function (data, type, row) {
+                                if (row['old_market_cap'] == null) {
+                                    return "<span class='text-info'>doesn't exists in DB</span>";
+                                }
+                                return '$ ' + row['old_market_cap']['market_cap'];
+                            }
+                        },
+                        {
+                            name: 'price', "render": function (data, type, row) {
+                                if (row['old_market_cap']== null) {
+                                    return "<span class='text-info'>doesn't exists in DB</span>";
+                                }
+                                return '$ ' + row['old_market_cap']['price'];
+                            }
+                        },
+                        {
+                            name: 'market_cap', "render": function (data, type, row) {
+
+                                return '$ ' + row['market_cap'];
+                            }
+                        },
                     ],
                     ajax: {
                         type: "POST",

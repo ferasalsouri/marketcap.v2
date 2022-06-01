@@ -38,25 +38,38 @@ class HomeController extends Controller
     public function ajaxdt(Request $request)
     {
 
+        $search = $request->input('search')['value'];
 
         $Length = $request->input("length");
         $Start = $request->input("start");
-        $Draw=$request->input("Draw");
-
-        $response = $this->cmc->cryptocurrency()->listingsLatest([ 'limit' => 5000, 'convert' => 'USD']);
+        $Draw = $request->input("draw");
+        $response = $this->cmc->cryptocurrency()->listingsLatest(['limit' => 5000, 'convert' => 'USD']);
 
         $marketCap = MarketCapResource::collection($response->data)->resolve();
+        if (!empty($search)) {
+            $items = collect($marketCap)
+                ->filter(function ($item) use ($search) {
+                    return stripos(strtolower($item['name']), strtolower($search)) !== false
+                        || stripos(strtolower($item['symbol']), strtolower($search)) !== false
+                        || stripos($item['symbol'], $search) !== false;
+                });
 
 
-        $items =collect($marketCap)->take($Length)->skip($Start);
+            $data = array_values($items->skip($Start)->take($Length)->toArray());
+            $totalCount = count($items);
+        } else {
+            $items = collect($marketCap)->skip($Start)->take($Length)->whereNotNull('old_market_cap.price');
+            $data = array_values($items->toArray());
 
-        $totalCount = $marketCap->count();
-//        $Draw = $marketCapdata->currentPage();
+            $totalCount = count($marketCap);
+        }
+
+
 
         return response()
             ->json(['draw' => $Draw, "recordsTotal" => $totalCount,
                 "recordsFiltered" => $totalCount,
-                "data" => $items]);
+                "data" => $data]);
 
     }
 

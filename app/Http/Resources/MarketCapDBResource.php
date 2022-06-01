@@ -16,7 +16,7 @@ class MarketCapDBResource extends JsonResource
     {
         return [
             'market_cap' => $this->market_cap,
-            'price' => $this->price,
+            'price' =>  $this->price,
         ];
     }
 }

@@ -9,4 +9,6 @@ class Coins extends Model
 {
     use HasFactory;
 
+    protected $primaryKey='IDs';
+
 }
