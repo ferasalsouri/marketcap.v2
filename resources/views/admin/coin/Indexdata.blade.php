@@ -71,7 +71,7 @@
         });
         var oTable;
         $(function () {
-           BindDataTable();
+            BindDataTable();
 
 
         });
@@ -94,7 +94,7 @@
         // }, 10000 );
 
         //هذه تختلف حسب الصفحة
-         function BindDataTable() {
+        function BindDataTable() {
             oTable =  $('#tblAjax').DataTable(
                 {
                     language: {
@@ -133,7 +133,7 @@
                                 if (row['old_market_cap'] == null) {
                                     return "<span class='text-info'>doesn't exists in DB</span>";
                                 }
-                                return '$ ' + row['old_market_cap']['market_cap'];
+                                return '$ ' + row['old_market_cap'];
                             }
                         },
                         {
@@ -141,12 +141,14 @@
                                 if (row['old_market_cap'] == null) {
                                     return "<span class='text-info'>doesn't exists in DB</span>";
                                 }
-                                return '$ ' + row['old_market_cap']['price'];
+                                return '$ ' + row['price'];
                             }
                         },
                         {
                             name: 'market_cap', "render": function (data, type, row) {
-
+                                if (row['market_cap'] == null) {
+                                    return "<span class='text-info'>doesn't exists in DB</span>";
+                                }
                                 return "<span class='text-success '>"+ '$ ' +row['market_cap']+"</span>";
                             }
                         },
@@ -154,7 +156,7 @@
                     ajax: {
                         type: "POST",
                         contentType: "application/json",
-                        url: '{{route('coin-market.ajaxdt')}}',
+                        url: '{{route('coin.ajaxdata')}}',
 
                         data: function (d) {
                             d._token = "{{csrf_token()}}";
@@ -170,12 +172,12 @@
                 });
 
 
-             setInterval(() => {
-                 oTable.ajax.reload(null,false );
-                 // $('#tblAjax').DataTable().draw()
-
-
-             }, 20000);
+            // setInterval(() => {
+            //     oTable.ajax.reload(null,false );
+            //     // $('#tblAjax').DataTable().draw()
+            //
+            //
+            // }, 20000);
 
         }
 

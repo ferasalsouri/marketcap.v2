@@ -15,7 +15,7 @@ use App\Http\Controllers\Admin\HomeController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return  redirect('login');
 });
 
 
@@ -24,6 +24,8 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::post('coin-market',[HomeController::class,'ajaxdt'])->name('coin-market.ajaxdt');
+Route::post('coin-marketAjaxdata',[HomeController::class,'ajaxdata'])->name('coin.ajaxdata');
+Route::get('coinMarket',[HomeController::class,'loadIndex'])->name('coin-market.ajaxdata');
 Route::resource('market-cap',HomeController::class);
 
 

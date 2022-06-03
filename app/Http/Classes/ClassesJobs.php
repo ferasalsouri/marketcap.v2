@@ -7,7 +7,7 @@ use Carbon\Carbon;
 class ClassesJobs
 {
 
-    protected $Api = '97244566-eba0-43a7-a5ff-055add7ae8d5';
+    protected $Api ='67d0f753-9502-46d6-8aa6-40eaedf9744d';// '97244566-eba0-43a7-a5ff-055add7ae8d5';
 
     public function ConnectionCoinMarketCap()
     {
@@ -18,7 +18,7 @@ class ClassesJobs
 
     public function periodStoreTime()
     {
-        $response = $this->ConnectionCoinMarketCap()->cryptocurrency()->listingsLatest(['cryptocurrency_type' => 'all', 'convert' => 'USD', 'limit' => 5000]);
+        $response = $this->ConnectionCoinMarketCap()->cryptocurrency()->map(['convert' => 'USD', 'limit' => 5000]);
 
         for ($i = 0; $i <= 4999; $i++) {
             $data[] = [

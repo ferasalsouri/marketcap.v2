@@ -6,7 +6,7 @@ use App\Models\Coins;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MarketCapResource extends JsonResource
+class                                                                                                             MarketCapResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
