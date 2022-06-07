@@ -7,7 +7,10 @@ use Carbon\Carbon;
 class ClassesJobs
 {
 
-    protected $Api ='67d0f753-9502-46d6-8aa6-40eaedf9744d';// '97244566-eba0-43a7-a5ff-055add7ae8d5';
+    //'67d0f753-9502-46d6-8aa6-40eaedf9744d';
+    //// '97244566-eba0-43a7-a5ff-055add7ae8d5';
+    protected $Api ='41920b5b-5276-438d-b187-55f443748d7a';
+
 
     public function ConnectionCoinMarketCap()
     {

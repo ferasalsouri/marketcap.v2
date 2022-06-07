@@ -16,6 +16,7 @@ class DataMarketCapResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id'=>$this->IDs,
             'name' => $this->name,
             'symbol' => $this->symbol,
             'num_market_pairs' => $this->num_market_pairs,

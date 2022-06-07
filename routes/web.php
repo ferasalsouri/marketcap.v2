@@ -25,6 +25,9 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::post('coin-market',[HomeController::class,'ajaxdt'])->name('coin-market.ajaxdt');
 Route::post('coin-marketAjaxdata',[HomeController::class,'ajaxdata'])->name('coin.ajaxdata');
+
+Route::post('loadData',[HomeController::class,'loadData'])->name('coin-market.loadData');
+Route::post('loadData',[HomeController::class,'loadData'])->name('coin-market.reloadData');
 Route::get('coinMarket',[HomeController::class,'loadIndex'])->name('coin-market.ajaxdata');
 Route::resource('market-cap',HomeController::class);
 

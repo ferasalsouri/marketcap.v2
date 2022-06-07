@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 
-<link href="{{asset('datatables/datatables.bundle.rtl.css')}}" rel="stylesheet" type="text/css"/>
+<link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
 
 <style>
     table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {
@@ -31,6 +31,7 @@
                         <table id="tblAjax" class="table table-hover table-responsive-sm">
                             <thead>
                             <tr>
+                                <th scope="col">#</th>
                                 <th scope="col">coin</th>
                                 <th scope="col">num market pairs</th>
                                 <th scope="col">open market cap</th>
@@ -56,10 +57,9 @@
 @section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    {{--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"--}}
-    {{--            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"--}}
-    {{--            crossorigin="anonymous"></script>--}}
-    <script src="{{asset('datatables/datatables.bundle.js')}}" type="text/javascript"></script>
+
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js" type="text/javascript"></script>
     <script>
         // $(document).ready(function () {
 
@@ -69,7 +69,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var oTable;
+        let oTable;
         $(function () {
             BindDataTable();
 
@@ -78,7 +78,7 @@
 
         function refreshTable() {
             setInterval(() => {
-                $('#tblAjax').DataTable().ajax.reload(null,false );
+                $('#tblAjax').DataTable().ajax.reload(null, false);
                 // $('#tblAjax').DataTable().draw()
 
 
@@ -94,8 +94,10 @@
         // }, 10000 );
 
         //هذه تختلف حسب الصفحة
+        let dataCollect = [];
+
         function BindDataTable() {
-            oTable =  $('#tblAjax').DataTable(
+            oTable = $('#tblAjax').DataTable(
                 {
                     language: {
                         aria: {
@@ -116,11 +118,14 @@
                     "sPaginationType": "full_numbers",
                     "bFilter": true,
                     "bDestroy": true,
+                    deferRender: true,
                     "bSort": true,
                     "bStateSave": true,
                     serverSide: true,
+                    dom: 'Bflrtip',
                     columns: [
 
+                        {data: 'id', name: 'id'},
                         {
                             name: 'name', "render": function (data, type, row) {
 
@@ -147,9 +152,24 @@
                         {
                             name: 'market_cap', "render": function (data, type, row) {
                                 if (row['market_cap'] == null) {
-                                    return "<span class='text-info'>doesn't exists in DB</span>";
+                                    return "<span class='text-info' data-id=" + row['id'] + ">doesn't exists in DB</span>";
                                 }
-                                return "<span class='text-success '>"+ '$ ' +row['market_cap']+"</span>";
+                                return "<span class='text-success '>" + '$ ' + row['market_cap'] + "</span>";
+
+                                {{--$.ajax({--}}
+                                {{--    method: "POST",--}}
+                                {{--    async: false,--}}
+                                {{--    url: "{{route('coin-market.reloadData')}}",--}}
+                                {{--    data: {--}}
+                                {{--        "data": row['id']--}}
+                                {{--    },--}}
+                                {{--    success: function (response) {--}}
+                                {{--        console.log(JSON.stringify(response['data']).market_cap)--}}
+
+                                {{--    }--}}
+                                {{--})--}}
+
+
                             }
                         },
                     ],
@@ -166,20 +186,60 @@
                         error: function (xhr, status, error) {
                             var err = eval("(" + xhr.responseText + ")");
                             alert(err.message);
-                        }
+                        },
+
+
+                    },
+
+                    "drawCallback": function (settings) {
+                        var api = this.api();
+                        var collect = []
+                        // Output the data for the visible rows to the browser's console
+                        api.rows().data().each(function (data) {
+                            collect.push(data.id)
+
+                        });
+
+                        $.ajax({
+                            method: "POST",
+                            async: false,
+                            url: "{{route('coin-market.reloadData')}}",
+                            data: {
+                                "data": collect.toString()
+                            },
+                            success: function (response) {
+                                let ids = response.data
+
+
+                                api.rows().data().each(function (data) {
+                                    let collection = ids.find(el => el.id === data.id);
+
+
+                                    let market_cap = $("table tr").find(`[data-id='${data.id}']`)
+                                    market_cap.text(collection['market_cap'])
+
+                                });
+
+                            }
+                        })
 
                     }
+
                 });
 
 
-            // setInterval(() => {
-            //     oTable.ajax.reload(null,false );
-            //     // $('#tblAjax').DataTable().draw()
-            //
-            //
-            // }, 20000);
+            setInterval(() => {
+                oTable.ajax.reload(null, false);
+                // $('#tblAjax').DataTable().draw()
+
+
+            }, 5000);
+
 
         }
+
+
+        //
 
 
     </script>
