@@ -19,7 +19,23 @@
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">{{ __('Dashboard') }}</div>
+                    <div class="card-header">
+
+                        <div class="row">
+                            <div class="col-6">
+                                <strong class="text-dark">
+                                    Total Market Cap: <span class="text-primary total_market_cap">$ 00.00</span>
+                                </strong>
+                            </div>
+                            <div class="col-6">
+                                <strong class="text-dark">
+                                    Total Market Cap yesterday: <span class="text-primary total_market_cap_yesterday">$ 00.00</span>
+                                </strong>
+                            </div>
+                        </div>
+
+
+                    </div>
 
                     <div class="card-body">
                         @if (session('status'))
@@ -33,15 +49,13 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">coin</th>
-                                <th scope="col">num market pairs</th>
                                 <th scope="col">open market cap</th>
+                                <th scope="col">open market cap (price * cs)</th>
                                 <th scope="col">open price</th>
 
                                 <th scope="col">market cap (now)</th>
+                                <th scope="col">current price (now)</th>
 
-                                {{--<th scope="col">created date</th>--}}
-                                {{--<th scope="col">received date</th>--}}
-                                {{--<th scope="col">rank</th>--}}
                             </tr>
                             </thead>
                             <tbody>
@@ -79,19 +93,11 @@
         function refreshTable() {
             setInterval(() => {
                 $('#tblAjax').DataTable().ajax.reload(null, false);
-                // $('#tblAjax').DataTable().draw()
 
 
             }, 10000);
         }
 
-        // var intervalId = window.setInterval(function(){
-        //     $('#tblAjax').data.reload();
-        //
-        // }, 5000);
-        // setInterval( function () {
-        //     $('#tblAjax').DataTable().ajax.reload(null,false );
-        // }, 10000 );
 
         //هذه تختلف حسب الصفحة
         let dataCollect = [];
@@ -125,16 +131,16 @@
                     dom: 'Bflrtip',
                     columns: [
 
-                        {data: 'id', name: 'id'},
+                        {data: 'id', name: 'id', width: "4%"},
                         {
-                            name: 'name', "render": function (data, type, row) {
+                            width: "10%", name: 'name', "render": function (data, type, row) {
 
                                 return row["name"] + " (" + `${row['symbol']}` + ")"
                             }
                         },
-                        {data: 'num_market_pairs', name: 'num_market_pairs'},
+
                         {
-                            name: 'old_market_cap', "render": function (data, type, row) {
+                            width: "15%", name: 'old_market_cap', "render": function (data, type, row) {
                                 if (row['old_market_cap'] == null) {
                                     return "<span class='text-info'>doesn't exists in DB</span>";
                                 }
@@ -142,7 +148,16 @@
                             }
                         },
                         {
-                            name: 'price', "render": function (data, type, row) {
+                            width: "18%", name: 'old_market_cap', "render": function (data, type, row) {
+                                if (row['old_market_cap'] == null) {
+                                    return "<span class='text-info'>doesn't exists in DB</span>";
+                                }
+
+                                return "<span class='text-success  text-center'>" + '$ ' + (row['circulating_supply'] * row['price']) + "</span>";
+                            }
+                        },
+                        {
+                            width: "16%", name: 'price', "render": function (data, type, row) {
                                 if (row['old_market_cap'] == null) {
                                     return "<span class='text-info'>doesn't exists in DB</span>";
                                 }
@@ -154,20 +169,15 @@
                                 if (row['market_cap'] == null) {
                                     return "<span class='text-info' data-id=" + row['id'] + ">doesn't exists in DB</span>";
                                 }
-                                return "<span class='text-success '>" + '$ ' + row['market_cap'] + "</span>";
+                                return "<span class='text-info'>" + '$ ' + row['market_cap'] + "</span>";
 
-                                {{--$.ajax({--}}
-                                {{--    method: "POST",--}}
-                                {{--    async: false,--}}
-                                {{--    url: "{{route('coin-market.reloadData')}}",--}}
-                                {{--    data: {--}}
-                                {{--        "data": row['id']--}}
-                                {{--    },--}}
-                                {{--    success: function (response) {--}}
-                                {{--        console.log(JSON.stringify(response['data']).market_cap)--}}
-
-                                {{--    }--}}
-                                {{--})--}}
+                            }
+                        },
+                        {
+                            name: 'market_cap', "render": function (data, type, row) {
+                                if (row['market_cap'] == null) {
+                                    return "<span class='text-info' data-price=" + row['id'] + ">doesn't exists in DB</span>";
+                                }
 
 
                             }
@@ -216,7 +226,10 @@
 
 
                                     let market_cap = $("table tr").find(`[data-id='${data.id}']`)
-                                    market_cap.text(collection['market_cap'])
+                                    market_cap.text('$ ' + collection['market_cap']);
+
+                                    let price = $("table tr").find(`[data-price='${data.id}']`)
+                                    price.text('$ ' + collection['current_price'])
 
                                 });
 
@@ -239,7 +252,11 @@
         }
 
 
-        //
+        $.post("{{route('coin-market.globalMetrics')}}", function (data, status) {
+
+            $('.total_market_cap').text('$ ' + data.data.total_market_cap)
+            $('.total_market_cap_yesterday').text('$ ' + data.data.total_market_cap_yesterday)
+        });
 
 
     </script>

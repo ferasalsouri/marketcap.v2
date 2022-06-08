@@ -6,9 +6,11 @@ use App\Http\Classes\ClassesJobs;
 use App\Http\Classes\PaginatorData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DataMarketCapResource;
+use App\Http\Resources\GlobalMetricsResource;
 use App\Http\Resources\MarketCapApiRersource;
 use App\Http\Resources\MarketCapResource;
 use App\Models\Coins;
+use CoinMarketCap\Features\GlobalMetrics;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -89,7 +91,7 @@ class HomeController extends Controller
         $Draw = $request->input("draw");
         $response = Coins::get();
 
-        $marketCap =  DataMarketCapResource::collection($response)->resolve();
+        $marketCap = DataMarketCapResource::collection($response)->resolve();
 
 
         if (!empty($search)) {
@@ -121,82 +123,31 @@ class HomeController extends Controller
     {
 
 
-        $response = $this->cmc->cryptocurrency()->quotesLatest(['id' => ''.$request->data.'', 'convert' => 'USD']);
+        $response = $this->cmc->cryptocurrency()->quotesLatest(['id' => '' . $request->data . '', 'convert' => 'USD']);
 
+        $marketCap = array_values(collect($response->data)->toArray());
 
-        $marketCap = array_values(collect($response->data)->toArray()) ;
-
-        $marketCapdata =  MarketCapApiRersource::collection($marketCap)->resolve();
+        $marketCapdata = MarketCapApiRersource::collection($marketCap)->resolve();
 
 
         return response()
-            ->json(["data" =>  $marketCapdata]);
+            ->json(["data" => $marketCapdata]);
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function globalMetrics()
     {
-//        dd(Coins::count());
+
+
+
+        $response = $this->cmc->globalMetrics()->quotesLatest(['convert' => 'USD']);
+        $marketCapdata = new GlobalMetricsResource($response->data);
+
+
+        return response()
+            ->json(["data" => $marketCapdata]);
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
