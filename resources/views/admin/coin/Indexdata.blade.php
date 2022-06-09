@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-
 <link href="{{asset('css/bootstrap.css')}}" rel="stylesheet"
       type="text/css"/>
 <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
@@ -64,14 +63,15 @@
                                 <th scope="col">#</th>
                                 <th scope="col">coin</th>
                                 <th scope="col">market cap (now)</th>
-
+                                <th scope="col"> dominance</th>
                                 <th scope="col">current price (now)</th>
                                 <th scope="col">difference</th>
+
                                 <th scope="col">open price</th>
 
                                 <th scope="col">open market cap</th>
                                 <th scope="col">open market cap (price * cs)</th>
-
+                                <th scope="col">open dominance</th>
 
                             </tr>
                             </thead>
@@ -98,21 +98,26 @@
         function format(d) {
             // `d` is the original data object for the row
 
-            console.log(d)
+// console.log(d)
             return '<tr class="child">' +
-                        '<td class="child" colspan="6">' +
-                            '<ul data-dtr-index="0" class="dtr-details">' +
-                                '<li data-dtr-index="6" data-dt-row="0" data-dt-column="6">' +
-                                    '<span class="dtr-title">open market cap</span>' +
-                                    ' <span class="dtr-data">$ 600261664669.09</span>' +
-                                '</li>' +
-                                '<li data-dtr-index="7" data-dt-row="0" data-dt-column="7">' +
-                                    '<span class="dtr-title">open market cap (price * cs)</span>' +
-                                    ' <span class="dtr-data"><span class="text-success  text-center">$ 600261664669.0977</span>' +
-                                '</span>' +
-                                '</li>' +
-                            '</ul>' +
-                        '</td>' +
+                '<td class="child" colspan="6">' +
+                '<ul data-dtr-index="0" class="dtr-details">' +
+                '<li data-dtr-index="6" data-dt-row="0" data-dt-column="6">' +
+                '<span class="dtr-title">open market cap</span>' +
+                ' <span class="dtr-data">$ '+`${d.old_market_cap}`+'</span>' +
+                '</li>' +
+                // '<li data-dtr-index="7" data-dt-row="0" data-dt-column="7">' +
+                // '<span class="dtr-title">open market cap (price * cs)</span>' +
+                // ' <span class="dtr-data"><span class="text-success  text-center">$ '+((`${d.market_cap}`/$('.total_market_cap').text())*100)+'</span>' +
+                // '</span>' +
+                // '</li>' +
+                '<li data-dtr-index="7" data-dt-row="0" data-dt-column="7">' +
+                '<span class="dtr-title">dominance</span>' +
+                ' <span class="dtr-data"><span class="text-success  text-center"> '+`${d.dominance}`+'</span>' +
+                '</span>' +
+                '</li>' +
+                '</ul>' +
+                '</td>' +
                 '</tr>';
         }
 
@@ -123,6 +128,12 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $.post("{{route('coin-market.globalMetrics')}}", function (data, status) {
+
+                $('.total_market_cap').text('$ ' + data.data.total_market_cap)
+                $('.total_market_cap_yesterday').text('$ ' + data.data.total_market_cap_yesterday)
+            });
+
             let oTable;
             var tr;
             var row;
@@ -196,6 +207,16 @@
 
                                 }
                             },
+
+                            {
+                                data: function (data, type, row) {
+                                    if (data['market_cap'] == null) {
+                                        return "<span class='text-info' data-dominance=" + data['id'] + ">doesn't exists in DB</span>";
+                                    }
+
+
+                                }
+                            },
                             {
                                 data: function (data, type, row) {
                                     if (data['market_cap'] == null) {
@@ -205,6 +226,7 @@
 
                                 }
                             },
+
                             {
                                 name: 'price', data: 'price', "render": function (data, type, row) {
                                     if (row['old_market_cap'] == null) {
@@ -231,6 +253,7 @@
                                     return "<span class='text-success  text-center'>" + '$ ' + (row['circulating_supply'] * row['price']) + "</span>";
                                 }
                             },
+                            {data: 'dominance', name: 'dominance', width: "4%"},
 
                         ],
                         ajax: {
@@ -282,6 +305,9 @@
 
                                         let def = $("table tr").find(`[data-def='${data.id}']`)
                                         def.text('$ ' + (data['old_market_cap'] - collection['market_cap']))
+                                        let dominance = $("table tr").find(`[data-dominance='${data.id}']`)
+                                        // dominance.text('$ ' + '1')
+                                        dominance.text( ((collection['market_cap']/ '{{globalMetrics()->quote->USD->total_market_cap}}')*100))
 
                                     });
 
@@ -302,7 +328,7 @@
                                 tr = $(this).closest('tr');
 
                                 row = oTable.row(tr);
-                                console.log( row.child.isShown())
+                                // console.log(row.child.isShown())
                                 if (row.child.isShown()) {
                                     // This row is already open - close it
                                     row.child.hide();
@@ -330,7 +356,6 @@
                 $.fn.dataTable.ext.errMode = 'none';
 
                 setInterval(function () {
-                    console.log(row.child.isShown())
                     oTable.ajax.reload(function () {
                         if (row.child.isShown()) {
                             // This row is already open - close it
@@ -358,11 +383,6 @@
             // }, 5000);
 
 
-            $.post("{{route('coin-market.globalMetrics')}}", function (data, status) {
-
-                $('.total_market_cap').text('$ ' + data.data.total_market_cap)
-                $('.total_market_cap_yesterday').text('$ ' + data.data.total_market_cap_yesterday)
-            });
 
 
         });

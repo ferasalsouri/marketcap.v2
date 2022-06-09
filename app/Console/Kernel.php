@@ -23,8 +23,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
-
-        $schedule->command('store:coins-marketcap')->dailyAt('03:05')->timezone('Asia/Jerusalem');
+        $schedule->command('store:marketcap-Info')->dailyAt('13:57')->timezone('Asia/Jerusalem');
+        $schedule->command('store:coins-marketcap')->dailyAt('13:57')->timezone('Asia/Jerusalem');
     }
 
     /**

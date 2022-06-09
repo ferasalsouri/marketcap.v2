@@ -36,6 +36,8 @@ class HomeController extends Controller
      */
     public function index()
     {
+
+
         return view('admin.coin.index');
     }
 
@@ -137,12 +139,8 @@ class HomeController extends Controller
 
     public function globalMetrics()
     {
-
-
-
         $response = $this->cmc->globalMetrics()->quotesLatest(['convert' => 'USD']);
         $marketCapdata = new GlobalMetricsResource($response->data);
-
 
         return response()
             ->json(["data" => $marketCapdata]);

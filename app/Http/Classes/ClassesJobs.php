@@ -1,7 +1,9 @@
 <?php namespace App\Http\Classes;
 
 
+use App\Http\Resources\GlobalMetricsResource;
 use App\Models\Coins;
+use App\Models\MarketCapInfo;
 use Carbon\Carbon;
 
 class ClassesJobs
@@ -9,11 +11,13 @@ class ClassesJobs
 
     //'67d0f753-9502-46d6-8aa6-40eaedf9744d';
     //// '97244566-eba0-43a7-a5ff-055add7ae8d5';
-    protected $Api ='41920b5b-5276-438d-b187-55f443748d7a';
+    private $Api = '41920b5b-5276-438d-b187-55f443748d7a';
+
 
 
     public function ConnectionCoinMarketCap()
     {
+
         return new \CoinMarketCap\Api($this->Api);
 
     }
@@ -21,7 +25,8 @@ class ClassesJobs
 
     public function periodStoreTime()
     {
-        $response = $this->ConnectionCoinMarketCap()->cryptocurrency()->map(['convert' => 'USD', 'limit' => 5000]);
+
+        $response = $this->ConnectionCoinMarketCap()->cryptocurrency()->listingsLatest(['limit' => 5000, 'convert' => 'USD']);
 
         for ($i = 0; $i <= 4999; $i++) {
             $data[] = [
@@ -43,13 +48,42 @@ class ClassesJobs
         if (Coins::count() > 0)
             Coins::query()->truncate();
         $chunks = array_chunk($data, 5000);
-
         foreach ($chunks as $chunk) {
 
             Coins::insert($chunk);
 
         }
         return true;
+    }
+
+    public function marketCapInfo()
+    {
+
+        $response = $this-> globalMetric();
+
+
+        if (MarketCapInfo::count() > 0)
+            MarketCapInfo::query()->truncate();
+
+        MarketCapInfo::create([
+            'total_market_cap' => $response->quote->USD->total_market_cap,
+            'total_market_cap_yesterday' => $response->quote->USD->total_market_cap_yesterday,
+            'last_update' => Carbon::parse($response->quote->USD->last_updated),
+        ]);
+
+
+        return true;
+    }
+
+    public function globalMetric()
+    {
+
+
+        $response = $this->ConnectionCoinMarketCap()->globalMetrics()->quotesLatest(['convert' => 'USD']);
+
+        return $response->data;
+
+
     }
 
 }
