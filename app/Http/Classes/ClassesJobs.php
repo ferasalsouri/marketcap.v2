@@ -9,16 +9,19 @@ use Carbon\Carbon;
 class ClassesJobs
 {
 
+    private $Api = '61a7604a-5586-4611-85fd-d3cc0a89d655';
+    //'c896e5e5-0f61-4f07-8906-b6e43c935be0';
+    //'41920b5b-5276-438d-b187-55f443748d7a';
     //'67d0f753-9502-46d6-8aa6-40eaedf9744d';
     //// '97244566-eba0-43a7-a5ff-055add7ae8d5';
-    private $Api = '41920b5b-5276-438d-b187-55f443748d7a';
-
 
 
     public function ConnectionCoinMarketCap()
     {
 
         return new \CoinMarketCap\Api($this->Api);
+
+
 
     }
 
@@ -59,7 +62,7 @@ class ClassesJobs
     public function marketCapInfo()
     {
 
-        $response = $this-> globalMetric();
+        $response = $this->globalMetric();
 
 
         if (MarketCapInfo::count() > 0)
@@ -81,9 +84,24 @@ class ClassesJobs
 
         $response = $this->ConnectionCoinMarketCap()->globalMetrics()->quotesLatest(['convert' => 'USD']);
 
+
         return $response->data;
 
 
     }
+
+
+    public function databaseGlobalMetrics()
+    {
+
+
+        $response = MarketCapInfo::first();
+
+        return $response;
+
+
+    }
+
+
 
 }

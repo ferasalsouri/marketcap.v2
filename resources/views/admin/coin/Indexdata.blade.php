@@ -196,7 +196,15 @@
 
                                 }
                             },
+                            {
+                                data: function (data, type, row) {
+                                    if (data['market_cap'] == null) {
+                                        return "<span class='text-info' data-dominance=" + data['id'] + ">doesn't exists in DB</span>";
+                                    }
 
+
+                                }
+                            },
                             {
                                 data: function (data, type, row) {
 
@@ -208,15 +216,7 @@
                                 }
                             },
 
-                            {
-                                data: function (data, type, row) {
-                                    if (data['market_cap'] == null) {
-                                        return "<span class='text-info' data-dominance=" + data['id'] + ">doesn't exists in DB</span>";
-                                    }
 
-
-                                }
-                            },
                             {
                                 data: function (data, type, row) {
                                     if (data['market_cap'] == null) {
@@ -293,6 +293,7 @@
                                     let ids = response.data
 
 
+
                                     api.rows().data().each(function (data) {
                                         let collection = ids.find(el => el.id === data.id);
 
@@ -315,31 +316,37 @@
                             })
 
                         },
-                        "initComplete": function () {
+                        "initComplete": function (setting) {
                             $('.loading').remove()
 
-                            $('#tblAjax tbody').on('click', 'td.dtr-control', function () {
+                                setInterval(() => {
+                                    oTable.ajax.reload(null, false);
+                                    // $('#tblAjax').DataTable().draw()
 
-                                if (tr !== null && tr !== undefined && row !== null) {
-                                    row.child.hide();
-                                    tr.removeClass('parent');
-                                }
 
-                                tr = $(this).closest('tr');
-
-                                row = oTable.row(tr);
-                                // console.log(row.child.isShown())
-                                if (row.child.isShown()) {
-                                    // This row is already open - close it
-                                    row.child.hide();
-                                    $('.dt-hasChild').removeClass('parent');
-                                } else {
-                                    // Open this row
-                                    row.child(format(row.data())).show();
-                                    $('.dt-hasChild').addClass('parent');
-                                }
-
-                            });
+                                }, 5000);
+                            // $('#tblAjax tbody').on('click', 'td.dtr-control', function () {
+                            //
+                            //     if (tr !== null && tr !== undefined && row !== null) {
+                            //         row.child.hide();
+                            //         tr.removeClass('parent');
+                            //     }
+                            //
+                            //     tr = $(this).closest('tr');
+                            //
+                            //     row = oTable.row(tr);
+                            //     // console.log(row.child.isShown())
+                            //     if (row.child.isShown()) {
+                            //         // This row is already open - close it
+                            //         row.child.hide();
+                            //         $('.dt-hasChild').removeClass('parent');
+                            //     } else {
+                            //         // Open this row
+                            //         row.child(format(row.data())).show();
+                            //         $('.dt-hasChild').addClass('parent');
+                            //     }
+                            //
+                            // });
                             // setInterval(function () {
                             //
                             //
@@ -350,37 +357,33 @@
 
                         }
 
+
                     });
 
 
-                $.fn.dataTable.ext.errMode = 'none';
+                // $.fn.dataTable.ext.errMode = 'none';
 
-                setInterval(function () {
-                    oTable.ajax.reload(function () {
-                        if (row.child.isShown()) {
-                            // This row is already open - close it
-                            row.child.hide();
-                            $('.dt-hasChild').removeClass('parent');
-                        } else {
-                            if (tr.hasClass('parent')) {
-                                // Open this row
-                                row.child(format(row.data())).show();
-                                $('.dt-hasChild').addClass('parent')
-                            }
-                        }
-                    });
-                }, 5000);
-
-                $('table td .dtr-control').html('<button><i class="fa fa-plus"></i></button>')
+                // setInterval(function () {
+                //     oTable.ajax.reload(function () {
+                //         if (row.child.isShown()) {
+                //             // This row is already open - close it
+                //             row.child.hide();
+                //             $('.dt-hasChild').removeClass('parent');
+                //         } else {
+                //             if (tr.hasClass('parent')) {
+                //                 // Open this row
+                //                 row.child(format(row.data())).show();
+                //                 $('.dt-hasChild').addClass('parent')
+                //             }
+                //         }
+                //     });
+                // }, 3700);
+                //
+                // $('table td .dtr-control').html('<button><i class="fa fa-plus"></i></button>')
             }
 
 
-            // setInterval(() => {
-            //     oTable.ajax.reload(null, false);
-            //     // $('#tblAjax').DataTable().draw()
-            //
-            //
-            // }, 5000);
+
 
 
 

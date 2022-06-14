@@ -19,8 +19,8 @@ class MarketCapApiRersource extends JsonResource
         return [
 
             'id'=>$this->id,
-            'market_cap' => $this->quote->USD->market_cap,
-            'current_price' => $this->quote->USD->price,
+            'market_cap' => $this->market_cap,
+            'current_price' => $this->price,
 
 
 

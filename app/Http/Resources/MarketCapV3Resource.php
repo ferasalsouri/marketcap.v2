@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Coins;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class  MarketCapResource extends JsonResource
+class MarketCapV3Resource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,34 +13,22 @@ class  MarketCapResource extends JsonResource
      * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray($request): array
+    public function toArray($request)
     {
-        $coin = Coins::find($this->id);
         return [
 
-
+            'id' => $this->id,
             'name' => $this->name,
             'symbol' => $this->symbol,
-            'old_market_cap' => new MarketCapDBResource($coin),
             'num_market_pairs' => $this->num_market_pairs,
             'market_cap' => $this->quote->USD->market_cap,
+            'price' => $this->quote->USD->price,
+//            'price' =>  number_format($this->quote->USD->price, 8, ',', '.'),// number_format($this->quote->USD->price, 2),
             'fully_diluted_market_cap' => $this->quote->USD->fully_diluted_market_cap,
             'total_supply' => $this->total_supply,
             'circulating_supply' => $this->circulating_supply,
             'updated_at' => Carbon::parse($this->quote->USD->last_updated),
 
-
-        ];
-
-    }
-
-
-    public function with($request)
-    {
-        return [
-            'meta' => [
-                'key' => 'value',
-            ],
         ];
     }
 }
