@@ -43,4 +43,7 @@ class MarketCapCorn extends Command
         $storeCoins->periodStoreTime();
         return 0;
     }
+
+
+
 }

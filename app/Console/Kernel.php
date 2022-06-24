@@ -9,6 +9,7 @@ class Kernel extends ConsoleKernel
 {
 
     protected $commands  = [
+        'App\Console\Commands\infoMarketCapCorn',
         'App\Console\Commands\MarketCapCorn',
 //        Commands\MarketCapCorn::class,
     ];
@@ -23,8 +24,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
-        $schedule->command('store:marketcap-Info')->dailyAt('21:42')->timezone('Asia/Jerusalem');
-        $schedule->command('store:coins-marketcap')->dailyAt('21:42')->timezone('Asia/Jerusalem');
+        $schedule->command('store:marketcap-Info')->dailyAt('22:05')->timezone('Asia/Jerusalem');
+        $schedule->command('store:coins-marketcap')->dailyAt('22:05')->timezone('Asia/Jerusalem');
     }
 
     /**
